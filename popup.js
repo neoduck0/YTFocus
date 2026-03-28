@@ -3,7 +3,7 @@ const DEFAULT_SETTINGS = {
   hideShorts: true,
   hideComments: true,
   hideHomeFeed: true,
-  hideVideoRecommendations: true
+  hideRecommendations: true
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,14 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const hideShorts = document.getElementById('hideShorts');
   const hideComments = document.getElementById('hideComments');
   const hideHomeFeed = document.getElementById('hideHomeFeed');
-  const hideVideoRecommendations = document.getElementById('hideVideoRecommendations');
+  const hideRecommendations = document.getElementById('hideRecommendations');
 
   chrome.storage.local.get(DEFAULT_SETTINGS, (settings) => {
     masterToggle.checked = settings.masterEnabled;
     hideShorts.checked = settings.hideShorts;
     hideComments.checked = settings.hideComments;
     hideHomeFeed.checked = settings.hideHomeFeed;
-    hideVideoRecommendations.checked = settings.hideVideoRecommendations;
+    hideRecommendations.checked = settings.hideRecommendations;
     updateToggleStates();
   });
 
@@ -39,14 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.set({ hideHomeFeed: hideHomeFeed.checked });
   });
 
-  hideVideoRecommendations.addEventListener('change', () => {
-    chrome.storage.local.set({ hideVideoRecommendations: hideVideoRecommendations.checked });
+  hideRecommendations.addEventListener('change', () => {
+    chrome.storage.local.set({ hideRecommendations: hideRecommendations.checked });
   });
 
   function updateToggleStates() {
     hideShorts.disabled = !masterToggle.checked;
     hideComments.disabled = !masterToggle.checked;
     hideHomeFeed.disabled = !masterToggle.checked;
-    hideVideoRecommendations.disabled = !masterToggle.checked;
+    hideRecommendations.disabled = !masterToggle.checked;
   }
 });
