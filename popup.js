@@ -53,8 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateIcon(enabled) {
+    const prefix = enabled ? 'icon' : 'icon-grey';
     chrome.action.setIcon({
-      path: enabled ? 'icon.png' : 'icon-grey.png'
+      path: {
+        '16': `${prefix}-16.png`,
+        '32': `${prefix}-32.png`,
+        '48': `${prefix}-48.png`,
+        '128': `${prefix}-128.png`
+      }
     });
   }
 });
