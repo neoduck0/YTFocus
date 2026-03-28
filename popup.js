@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateIcon(enabled) {
-    const prefix = enabled ? 'icon' : 'icon-grey';
+    const prefix = enabled ? 'icons/icon' : 'icons/icon-grey';
     chrome.action.setIcon({
       path: {
         '16': `${prefix}-16.png`,
