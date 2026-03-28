@@ -20,11 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
     hideHomeFeed.checked = settings.hideHomeFeed;
     hideRecommendations.checked = settings.hideRecommendations;
     updateToggleStates();
+    updateIcon(settings.masterEnabled);
   });
 
   masterToggle.addEventListener('change', () => {
     chrome.storage.local.set({ masterEnabled: masterToggle.checked });
     updateToggleStates();
+    updateIcon(masterToggle.checked);
   });
 
   hideShorts.addEventListener('change', () => {
@@ -48,5 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
     hideComments.disabled = !masterToggle.checked;
     hideHomeFeed.disabled = !masterToggle.checked;
     hideRecommendations.disabled = !masterToggle.checked;
+  }
+
+  function updateIcon(enabled) {
+    chrome.action.setIcon({
+      path: enabled ? 'icon.png' : 'icon-grey.png'
+    });
   }
 });
