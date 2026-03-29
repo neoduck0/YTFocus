@@ -122,10 +122,9 @@
     if (!settings.masterEnabled || !settings.hideRecommendations) return;
 
     if (window.location.pathname === '/watch') {
-      const recommendations = document.querySelector('#secondary, ytd-watch-next-secondary-results-renderer');
-      if (recommendations) {
-        recommendations.classList.add('ytfocus-recommendations');
-      }
+      document.querySelectorAll('#secondary, ytd-watch-next-secondary-results-renderer').forEach((el) => {
+        el.classList.add('ytfocus-recommendations');
+      });
     }
 
     document.querySelectorAll('.ytfocus-recommendations').forEach((el) => {
