@@ -19,6 +19,14 @@
   function hideShorts() {
     if (!settings.masterEnabled || !settings.hideShorts) return;
 
+    document.querySelectorAll('ytd-video-renderer').forEach((el) => {
+      const link = el.querySelector('a[href*="/shorts/"]');
+      const overlay = el.querySelector('ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"]');
+      if (link || overlay) {
+        el.classList.add('ytfocus-shorts');
+      }
+    });
+
     document.querySelectorAll('ytd-rich-item-renderer, ytd-grid-video-renderer').forEach((el) => {
       const link = el.querySelector('a[href*="/shorts/"]');
       if (link) {
