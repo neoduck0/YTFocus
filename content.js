@@ -6,11 +6,46 @@
     hideRecommendations: true
   };
 
+  const STYLE_ID = 'ytfocus-filter-styles';
+
   let settings = DEFAULT_SETTINGS;
+  let filterScheduled = false;
+
+  function ensureHideStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = [
+      '.ytfocus-shorts { display: none !important; }',
+      '.ytfocus-comments { display: none !important; }',
+      '.ytfocus-recommendations { display: none !important; }'
+    ].join('\n');
+    (document.head || document.documentElement).appendChild(style);
+  }
+
+  function scheduleApplyFilters(delay = 0) {
+    if (delay > 0) {
+      window.setTimeout(() => {
+        scheduleApplyFilters();
+      }, delay);
+      return;
+    }
+
+    if (filterScheduled) return;
+    filterScheduled = true;
+
+    window.requestAnimationFrame(() => {
+      filterScheduled = false;
+      if (!settings.masterEnabled) return;
+      applyFilters();
+    });
+  }
 
   function loadSettings() {
     chrome.storage.local.get(DEFAULT_SETTINGS, (result) => {
       settings = result;
+      ensureHideStyles();
       applyFilters();
     });
   }
@@ -18,7 +53,7 @@
   function hideShorts() {
     if (!settings.masterEnabled || !settings.hideShorts) return;
 
-    document.querySelectorAll('ytd-video-renderer').forEach((el) => {
+    document.querySelectorAll('ytd-video-renderer:not(.ytfocus-shorts)').forEach((el) => {
       const link = el.querySelector('a[href*="/shorts/"]');
       const overlay = el.querySelector('ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"]');
       if (link || overlay) {
@@ -26,50 +61,50 @@
       }
     });
 
-    document.querySelectorAll('ytd-rich-item-renderer, ytd-grid-video-renderer').forEach((el) => {
+    document.querySelectorAll('ytd-rich-item-renderer:not(.ytfocus-shorts), ytd-grid-video-renderer:not(.ytfocus-shorts)').forEach((el) => {
       const link = el.querySelector('a[href*="/shorts/"]');
       if (link) {
         el.classList.add('ytfocus-shorts');
       }
     });
 
-    document.querySelectorAll('ytd-rich-section-renderer').forEach((el) => {
+    document.querySelectorAll('ytd-rich-section-renderer:not(.ytfocus-shorts)').forEach((el) => {
       const link = el.querySelector('a[href*="/shorts/"]');
       const title = el.querySelector('#title');
-      if (link || (title && title.textContent && title.textContent.includes('Shorts'))) {
+      if (link || title?.textContent?.includes('Shorts')) {
         el.classList.add('ytfocus-shorts');
       }
     });
 
-    document.querySelectorAll('ytd-shelf-renderer').forEach((el) => {
+    document.querySelectorAll('ytd-shelf-renderer:not(.ytfocus-shorts)').forEach((el) => {
       const title = el.querySelector('#title, #title-text');
-      if (title && title.textContent && title.textContent.includes('Shorts')) {
+      if (title?.textContent?.includes('Shorts')) {
         el.classList.add('ytfocus-shorts');
       }
     });
 
-    document.querySelectorAll('grid-shelf-view-model').forEach((el) => {
+    document.querySelectorAll('grid-shelf-view-model:not(.ytfocus-shorts)').forEach((el) => {
       const title = el.querySelector('.yt-shelf-header-layout__title');
-      if (title && title.textContent && title.textContent.includes('Shorts')) {
+      if (title?.textContent?.includes('Shorts')) {
         el.classList.add('ytfocus-shorts');
       }
     });
 
-    document.querySelectorAll('ytm-shorts-lockup-view-model-v2').forEach((el) => {
+    document.querySelectorAll('ytm-shorts-lockup-view-model-v2:not(.ytfocus-shorts)').forEach((el) => {
       el.classList.add('ytfocus-shorts');
     });
 
-    document.querySelectorAll('ytd-guide-entry-renderer, ytd-mini-guide-entry-renderer').forEach((el) => {
+    document.querySelectorAll('ytd-guide-entry-renderer:not(.ytfocus-shorts), ytd-mini-guide-entry-renderer:not(.ytfocus-shorts)').forEach((el) => {
       const title = el.getAttribute('title');
       const link = el.querySelector('a[href*="/shorts"]');
-      const icon = el.querySelector('yt-icon');
       if (title === 'Shorts' || (link && link.getAttribute('href').includes('/shorts'))) {
         el.classList.add('ytfocus-shorts');
       }
     });
 
     document.querySelectorAll('a[title="Shorts"]').forEach((el) => {
-      el.closest('ytd-guide-entry-renderer, ytd-mini-guide-entry-renderer').classList.add('ytfocus-shorts');
+      const parent = el.closest('ytd-guide-entry-renderer, ytd-mini-guide-entry-renderer');
+      if (parent) parent.classList.add('ytfocus-shorts');
     });
 
     document.querySelectorAll('yt-formatted-string').forEach((el) => {
@@ -79,34 +114,26 @@
       }
     });
 
-    document.querySelectorAll('ytd-watch-next-secondary-results-renderer, ytd-compact-video-renderer').forEach((el) => {
+    document.querySelectorAll('ytd-watch-next-secondary-results-renderer:not(.ytfocus-shorts), ytd-compact-video-renderer:not(.ytfocus-shorts)').forEach((el) => {
       const link = el.querySelector('a[href*="/shorts/"]');
       if (link) {
         el.classList.add('ytfocus-shorts');
       }
     });
 
-    document.querySelectorAll('tp-yt-iron-tab, yt-tab-shape').forEach((el) => {
+    document.querySelectorAll('tp-yt-iron-tab:not(.ytfocus-shorts), yt-tab-shape:not(.ytfocus-shorts)').forEach((el) => {
       const text = el.textContent || el.innerText;
       if (text && text.trim().toLowerCase() === 'shorts') {
         el.classList.add('ytfocus-shorts');
       }
-    });
-
-    document.querySelectorAll('.ytfocus-shorts').forEach((el) => {
-      el.style.display = 'none';
     });
   }
 
   function hideComments() {
     if (!settings.masterEnabled || !settings.hideComments) return;
 
-    document.querySelectorAll('ytd-comments, #comments').forEach((el) => {
+    document.querySelectorAll('ytd-comments:not(.ytfocus-comments), #comments:not(.ytfocus-comments)').forEach((el) => {
       el.classList.add('ytfocus-comments');
-    });
-
-    document.querySelectorAll('.ytfocus-comments').forEach((el) => {
-      el.style.display = 'none';
     });
   }
 
@@ -121,17 +148,15 @@
     }
 
     if (window.location.pathname === '/watch') {
-      document.querySelectorAll('#secondary, ytd-watch-next-secondary-results-renderer').forEach((el) => {
+      document.querySelectorAll('#secondary:not(.ytfocus-recommendations), ytd-watch-next-secondary-results-renderer:not(.ytfocus-recommendations)').forEach((el) => {
         el.classList.add('ytfocus-recommendations');
       });
     }
-
-    document.querySelectorAll('.ytfocus-recommendations').forEach((el) => {
-      el.style.display = 'none';
-    });
   }
 
   function applyFilters() {
+    ensureHideStyles();
+
     if (settings.hideShorts && settings.masterEnabled) {
       hideShorts();
     }
@@ -162,22 +187,19 @@
     for (let key in changes) {
       settings[key] = changes[key].newValue;
     }
+
     if (!settings.masterEnabled) {
       clearAllFilters();
     } else {
       if (!settings.hideShorts) clearFilter('ytfocus-shorts');
       if (!settings.hideComments) clearFilter('ytfocus-comments');
       if (!settings.hideRecommendations) clearFilter('ytfocus-recommendations');
-      applyFilters();
+      scheduleApplyFilters();
     }
   });
 
   const observer = new MutationObserver(() => {
-    if (settings.masterEnabled) {
-      if (settings.hideShorts) hideShorts();
-      if (settings.hideComments) hideComments();
-      if (settings.hideRecommendations) hideRecommendations();
-    }
+    scheduleApplyFilters();
   });
 
   observer.observe(document.body || document.documentElement, {
@@ -189,8 +211,9 @@
   new MutationObserver(() => {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
-      setTimeout(applyFilters, 1000);
-      setTimeout(applyFilters, 3000);
+      scheduleApplyFilters();
+      scheduleApplyFilters(1000);
+      scheduleApplyFilters(3000);
     }
   }).observe(document.body || document.documentElement, { childList: true, subtree: true });
 })();

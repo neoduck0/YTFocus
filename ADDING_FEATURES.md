@@ -6,7 +6,7 @@ This guide explains how to add a new filtering functionality (e.g., hide live ch
 
 To add a new feature, you need to modify 3 files:
 1. `popup.html` - Add the toggle UI
-2. `popup.js` - Handle toggle state with localStorage
+2. `popup.js` - Handle toggle state with `chrome.storage.local`
 3. `content.js` - Add the hiding logic
 
 ---

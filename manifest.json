@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "YTFocus",
-    "version": "0.4.1",
+    "version": "1.0.0",
     "description": "A Chrome extension to customize and declutter your YouTube experience",
     "permissions": [
         "storage"
